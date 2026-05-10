@@ -146,6 +146,7 @@ This adds a **5-second delay** between each download. Adjust the timeout value a
 | `--image` | | Also download the video thumbnail (JPG) | `--image` |
 | `--gif` | | Also download the video thumbnail as GIF | `--gif` |
 | `--seek-preview` | | Also download seek preview sprite + VTT (scrubber thumbnails) | `--seek-preview` |
+| `--use-title` | | Use video title as filename instead of video ID | `--use-title` |
 | `--mcp` | | Start as MCP server (for AI assistants) | `--mcp` |
 
 ### Use as MCP server (AI assistants)
@@ -189,6 +190,12 @@ loom-dl --list videos.txt --prefix "course" --out ./downloads
 
 # Batch download with rate limiting
 loom-dl --list videos.txt --timeout 3000 --prefix "meeting"
+
+# Download with original video title as filename
+loom-dl --url https://www.loom.com/share/abc123def456 --use-title
+
+# Batch download using video titles as filenames
+loom-dl --list videos.txt --out ./downloads --use-title
 ```
 
 ## ⚙️ Configuration Management

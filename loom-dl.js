@@ -128,6 +128,10 @@ const argv = yargs(hideBin(process.argv))
     type: 'boolean',
     description: 'Also download the seek preview sprite image and VTT (for scrubber thumbnails)'
   })
+  .option('use-title', {
+    type: 'boolean',
+    description: 'Use the video title as the filename instead of the video ID'
+  })
   .option('save-config', {
     type: 'boolean',
     description: 'Save current options as defaults'
@@ -569,6 +573,9 @@ const extractId = (url) => {
 
 const delay = (ms) => new Promise(r => setTimeout(r, ms));
 
+const sanitizeFilename = (name) =>
+  name.replace(/[\\/:*?"<>|]/g, '-').replace(/\s+/g, ' ').trim().slice(0, 200);
+
 const appendToLogFile = async (id) => {
   await fsPromises.appendFile(path.join(__dirname, 'downloaded.log'), `${id}\n`);
 };
@@ -616,7 +623,8 @@ const downloadSingleFile = async () => {
   if (argv.out && path.extname(argv.out) !== '') {
     videoPath = path.resolve(argv.out);
   } else {
-    videoPath = getOutputPath(id, outputDir, 'mp4');
+    const basename = argv['use-title'] && info.title ? sanitizeFilename(info.title) : id;
+    videoPath = getOutputPath(basename, outputDir, 'mp4');
   }
   
   const transcriptPath = videoPath.replace(/\.mp4$/, '.transcript.json');
@@ -694,7 +702,8 @@ const downloadFromList = async () => {
     const id = extractId(url);
     try {
       const info = await fetchLoomVideoInfo(id);
-      const filename = argv.prefix ? `${argv.prefix}-${urls.indexOf(url) + 1}-${id}` : id;
+      const titleBase = argv['use-title'] && info.title ? sanitizeFilename(info.title) : id;
+      const filename = argv.prefix ? `${argv.prefix}-${urls.indexOf(url) + 1}-${titleBase}` : titleBase;
       const videoPath = path.join(outputDirectory, `${filename}.mp4`);
       const transcriptPath = path.join(outputDirectory, `${filename}.transcript.json`);
       

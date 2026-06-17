@@ -46,6 +46,9 @@ cd loom-downloader
 
 # Install dependencies
 npm install
+
+# Run the tool
+node loom-dl.js --url https://www.loom.com/share/[VideoId]
 ```
 
 ### 🔧 Dependencies
@@ -138,6 +141,40 @@ This adds a **5-second delay** between each download. Adjust the timeout value a
 | `--save-config` | | Save current options as defaults | `--save-config --quality best` |
 | `--show-config` | | Display current configuration | `--show-config` |
 | `--reset-config` | | Reset configuration to defaults | `--reset-config` |
+| `--transcript` | | Also download transcript as JSON | `--transcript` |
+| `--transcript-only` | | Download only the transcript | `--transcript-only` |
+| `--image` | | Also download the video thumbnail (JPG) | `--image` |
+| `--gif` | | Also download the video thumbnail as GIF | `--gif` |
+| `--seek-preview` | | Also download seek preview sprite + VTT (scrubber thumbnails) | `--seek-preview` |
+| `--use-title` | | Use video title as filename instead of video ID | `--use-title` |
+| `--mcp` | | Start as MCP server (for AI assistants) | `--mcp` |
+
+### Use as MCP server (AI assistants)
+
+You can run the tool as an **MCP (Model Context Protocol) server** so AI assistants (e.g. Cursor, Claude Desktop) can download Loom videos for you via tools.
+
+**1. Add to your MCP config** (e.g. Cursor settings or `claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "loom-downloader": {
+      "command": "npx",
+      "args": ["-y", "loom-dl@latest", "--mcp"]
+    }
+  }
+}
+```
+
+**2. Tools exposed to the AI**
+
+| Tool | Description |
+|------|-------------|
+| `download_loom_video` | Download a Loom video from a share URL. Optional: `output_dir`, `with_transcript`, `with_image`, `with_gif`, `with_seek_preview`. |
+| `get_loom_video_info` | Get video info (title, duration, transcript availability) without downloading. |
+
+**Example (AI can call):**  
+`download_loom_video({ "url": "https://www.loom.com/share/VIDEO_ID", "with_transcript": true })`
 
 ## 🚀 Quick Start Examples
 
@@ -153,6 +190,12 @@ loom-dl --list videos.txt --prefix "course" --out ./downloads
 
 # Batch download with rate limiting
 loom-dl --list videos.txt --timeout 3000 --prefix "meeting"
+
+# Download with original video title as filename
+loom-dl --url https://www.loom.com/share/abc123def456 --use-title
+
+# Batch download using video titles as filenames
+loom-dl --list videos.txt --out ./downloads --use-title
 ```
 
 ## 🌐 Web Interface
